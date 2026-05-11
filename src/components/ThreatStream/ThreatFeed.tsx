@@ -6,6 +6,7 @@ interface ThreatFeedProps {
   events: ThreatEvent[];
   onSelect?: (e: ThreatEvent) => void;
   selected?: ThreatEvent | null;
+  onIPClick?: (ip: string) => void;
 }
 
 const SEVERITY_CONFIG: Record<Severity, { label: string; bg: string; text: string; border: string; dot: string }> = {
@@ -19,7 +20,7 @@ function formatTime(ts: number) {
   return new Date(ts).toISOString().slice(11, 19);
 }
 
-export default function ThreatFeed({ events, onSelect, selected }: ThreatFeedProps) {
+export default function ThreatFeed({ events, onSelect, selected, onIPClick }: ThreatFeedProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isUserScrolling = useRef(false);
   const scrollTimer = useRef<ReturnType<typeof setTimeout>>();
@@ -80,6 +81,7 @@ export default function ThreatFeed({ events, onSelect, selected }: ThreatFeedPro
               event={event}
               isSelected={selected?.id === event.id}
               onClick={() => onSelect?.(event)}
+              onIPClick={onIPClick}
             />
           ))}
         </AnimatePresence>
@@ -88,7 +90,7 @@ export default function ThreatFeed({ events, onSelect, selected }: ThreatFeedPro
   );
 }
 
-function EventCard({ event, isSelected, onClick }: { event: ThreatEvent; isSelected: boolean; onClick: () => void }) {
+function EventCard({ event, isSelected, onClick, onIPClick }: { event: ThreatEvent; isSelected: boolean; onClick: () => void; onIPClick?: (ip: string) => void }) {
   const cfg = SEVERITY_CONFIG[event.severity];
 
   return (
@@ -132,7 +134,12 @@ function EventCard({ event, isSelected, onClick }: { event: ThreatEvent; isSelec
       <div className="flex items-center justify-between">
         <span className="text-xs font-mono text-slate-500 truncate">{event.signature}</span>
         {event.ioc && (
-          <span className="text-xs font-mono text-cyber-cyan/60 truncate ml-2 max-w-[100px]">{event.ioc}</span>
+          <button
+            onClick={(e) => { e.stopPropagation(); onIPClick?.(event.ioc!); }}
+            className="text-xs font-mono text-cyber-cyan/70 hover:text-cyber-cyan truncate ml-2 max-w-[100px] underline-offset-2 hover:underline transition-colors"
+          >
+            {event.ioc}
+          </button>
         )}
       </div>
     </motion.div>

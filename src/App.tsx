@@ -7,6 +7,9 @@ import ProtocolObservatory from './components/Protocol/ProtocolObservatory';
 import InfraGrid from './components/Infrastructure/InfraGrid';
 import ReplaySystem from './components/Replay/ReplaySystem';
 import HeatwaveSystem from './components/Heatwave/HeatwaveSystem';
+import AttackChainTimeline from './components/AttackChain/AttackChainTimeline';
+import IPInspector from './components/IPInspector/IPInspector';
+import CVEFeed from './components/CVEFeed/CVEFeed';
 import { wsEngine } from './services/websocket';
 import { fetchOTXPulses } from './services/otx';
 import { generateAttackArc, generateCountryPressure } from './services/mockTelemetry';
@@ -24,6 +27,7 @@ export default function App() {
   const [nodes, setNodes] = useState<InfraNode[]>([]);
   const [pressure, setPressure] = useState<CountryPressure[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<ThreatEvent | null>(null);
+  const [inspectIP, setInspectIP] = useState<string | null>(null);
   const [wsStatus, setWsStatus] = useState<'live' | 'connecting' | 'offline'>('connecting');
   const otxFetched = useRef(false);
 
@@ -86,7 +90,7 @@ export default function App() {
                 <ThreatGlobe arcs={arcs} events={events} pressure={pressure} onEventClick={setSelectedEvent} />
               </div>
               <div className="w-80 flex-shrink-0">
-                <ThreatFeed events={events} onSelect={setSelectedEvent} selected={selectedEvent} />
+                <ThreatFeed events={events} onSelect={setSelectedEvent} selected={selectedEvent} onIPClick={setInspectIP} />
               </div>
             </motion.div>
           )}
@@ -96,7 +100,7 @@ export default function App() {
               exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}
               className="absolute inset-0 p-3 flex gap-3">
               <div className="flex-1">
-                <ThreatFeed events={events} onSelect={setSelectedEvent} selected={selectedEvent} />
+                <ThreatFeed events={events} onSelect={setSelectedEvent} selected={selectedEvent} onIPClick={setInspectIP} />
               </div>
               {selectedEvent && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
@@ -147,10 +151,27 @@ export default function App() {
             </motion.div>
           )}
 
+          {activeView === 'chain' && (
+            <motion.div key="chain" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="absolute inset-0 p-3">
+              <AttackChainTimeline events={events} onSelectIP={setInspectIP} />
+            </motion.div>
+          )}
+
+          {activeView === 'cve' && (
+            <motion.div key="cve" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.3 }} className="absolute inset-0 p-3">
+              <CVEFeed />
+            </motion.div>
+          )}
+
         </AnimatePresence>
       </div>
 
       <StatusBar events={events} protocols={protocols} />
+
+      {/* Global IP Inspector modal */}
+      <IPInspector ip={inspectIP} onClose={() => setInspectIP(null)} />
     </div>
   );
 }

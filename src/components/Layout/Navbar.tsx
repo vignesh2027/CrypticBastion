@@ -16,6 +16,8 @@ const VIEWS: { id: ActiveView; label: string; icon: string; color: string }[] = 
   { id: 'infra', label: 'INFRA GRID', icon: '⬡', color: 'text-cyber-green' },
   { id: 'replay', label: 'REPLAY', icon: '⏮', color: 'text-slate-400' },
   { id: 'heatwave', label: 'HEATWAVE', icon: '⬥', color: 'text-cyber-red' },
+  { id: 'chain', label: 'ATK CHAIN', icon: '◉', color: 'text-purple-400' },
+  { id: 'cve', label: 'CVE FEED', icon: '⚠', color: 'text-orange-400' },
 ];
 
 const WS_CONFIG = {

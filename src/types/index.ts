@@ -110,4 +110,4 @@ export interface OTXIndicator {
 
 export type ReplayMode = '5min' | '1hour' | '24hour';
 
-export type ActiveView = 'globe' | 'threatstream' | 'protocol' | 'infra' | 'replay' | 'heatwave';
+export type ActiveView = 'globe' | 'threatstream' | 'protocol' | 'infra' | 'replay' | 'heatwave' | 'chain' | 'cve';
